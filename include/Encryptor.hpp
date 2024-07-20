@@ -19,7 +19,8 @@ public:
 	Encryptor();
 	std::string Encrypt(const std::string& msg);
 	std::string Decrypt(const std::string& cipher);
-
+	bool Encrypt(const std::string& src_file, const std::string& out_file);
+	bool Decrypt(const std::string& src_file, const std::string& out_file);
 private:
 	unsigned char* _key;
 	unsigned char* _iv;

@@ -1,5 +1,7 @@
 #include <Encryptor.hpp>
 #include <openssl/evp.h>
+#include <fstream>
+#include <iostream>
 
 using namespace std;
 
@@ -32,4 +34,44 @@ std::string Encryptor::Decrypt(const std::string& cipher) {
 	EVP_DecryptFinal(ctx, buf.data(), &len);
 	msg.append((char*)buf.data(), len);
 	return msg;
+}
+
+bool Encryptor::Encrypt(const std::string& src_file, const std::string& out_file) {
+	ifstream ifs;
+	ifs.open(src_file);
+	ifs.seekg(0, ios::end);
+	size_t file_size = ifs.tellg();
+	ifs.seekg(0);
+	cout << "file size:" << file_size<< endl;
+	if (file_size <= 0)
+		return false;
+	string ctx(file_size, ' ');
+	ifs.read(&ctx[0], file_size);
+	auto cipher = Encrypt(ctx);
+	ifs.close();
+	ofstream ofs;
+	ofs.open(out_file);
+	ofs.write(cipher.c_str(), cipher.size());
+	ofs.close();
+	return true;
+}
+
+bool Encryptor::Decrypt(const std::string& src_file, const std::string& out_file) {
+	ifstream ifs;
+	ifs.open(src_file);
+	ifs.seekg(0, ios::end);
+	size_t file_size = ifs.tellg();
+	ifs.seekg(0);
+	cout << "file size:" << file_size << endl;
+	if (file_size <= 0)
+		return false;
+	string ctx(file_size, ' ');
+	ifs.read(&ctx[0], file_size);
+	auto msg = Decrypt(ctx);
+	ifs.close();
+	ofstream ofs;
+	ofs.open(out_file);
+	ofs.write(msg.c_str(), msg.size());
+	ofs.close();
+	return true;
 }
