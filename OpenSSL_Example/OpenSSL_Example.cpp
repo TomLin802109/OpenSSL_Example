@@ -2,6 +2,7 @@
 //
 
 #include <iostream>
+#include <fstream>
 #include <Encryptor.hpp>
 
 using namespace std;
@@ -27,10 +28,33 @@ void MessageEncrypt(const string& msg) {
     cout << "  time cost:" << (et - st) << "ms" << endl;
 }
 
-int main()
+void ShowHelp() {
+
+}
+
+int main(int argc, char* argv[])
 {
+    for (int i = 1; i < argc; i++) {
+        cout << argv[i] << endl;
+    }
+    Encryptor enc;
+    string msg_file = "msg_en.txt";
+    string cipher_file = "cipher_en.txt";
+    auto st = clock();
+    if (enc.Encrypt(msg_file, cipher_file, false)) {
+        auto et = clock();
+        cout << "Encrypt file " << msg_file << " to " << cipher_file << " successfully, cost " << et - st << "ms" << endl;
+    }
+    
+    st = clock();
+    if (enc.Decrypt(cipher_file, msg_file, false)) {
+        auto et = clock();
+        cout << "Decrypt file " << cipher_file << " to " << msg_file << " successfully, cost " << et - st << "ms" << endl;
+    }
+    
+
     vector<string> cases = {
-        "123456", "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        "123456", "ABCDEFGHIJKLMNOPQRSTUVWXYZ","中文測試訊息",
         "PC_CPU_ABCDEFGHIJKLMNOPQRSTUVWXYZ,;%!^@1234567890#$*&/?abcdefghijklmnopqrstuvwxyz"
     };
     for(auto& i : cases)

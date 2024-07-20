@@ -17,10 +17,24 @@ class Encryptor
 {
 public:
 	Encryptor();
+	Encryptor(const std::string& key, const std::string& iv);
+
+	/// <summary>
+	/// Encrypt a message
+	/// </summary>
+	/// <param name="msg">source message</param>
+	/// <returns>cipher</returns>
 	std::string Encrypt(const std::string& msg);
+	/// <summary>
+	/// Decrypt a cipher
+	/// </summary>
+	/// <param name="cipher"></param>
+	/// <returns>origin message</returns>
 	std::string Decrypt(const std::string& cipher);
-	bool Encrypt(const std::string& src_file, const std::string& out_file);
-	bool Decrypt(const std::string& src_file, const std::string& out_file);
+	bool Encrypt(const std::string& src_file, const std::string& out_file, bool binary);
+	bool Decrypt(const std::string& src_file, const std::string& out_file, bool binary);
+	void SetKey(const std::string& key);
+	void SetInitVec(const std::string& iv);
 private:
 	unsigned char* _key;
 	unsigned char* _iv;
