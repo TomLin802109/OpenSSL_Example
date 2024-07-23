@@ -30,7 +30,11 @@
 *.exe
 *.out
 *.app
+*.cxx
 
 .vs
 x64
 *.user
+bin
+obj
+cs_wrapper
