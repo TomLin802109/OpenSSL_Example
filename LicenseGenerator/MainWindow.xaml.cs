@@ -72,6 +72,16 @@ namespace LicenseGenerator
             }
         }
 
+        private string loadSN(string fileName, bool is_pc)
+        {
+            var cipher_b = File.ReadAllBytes(_vm.MainDir + fileName);
+            var enc = new Encryptor();
+            if (!is_pc)
+                enc.SetKey(_key);
+            var sn_b = enc.Decrypt(new ByteData(cipher_b)).ToArray();
+            return Encoding.UTF8.GetString(sn_b);
+        }
+
         private bool GenerateLicense(string fileName, string sn, bool defKey=true)
         {
             var in_b = Encoding.UTF8.GetBytes(sn);
@@ -97,7 +107,9 @@ namespace LicenseGenerator
             var lm = new LicenseModel("pc", "cpu", _vm.CpuSN);
             if (GenerateLicense(lm.FileName, _vm.CpuSN, true))
             {
+                lm.SN = loadSN(lm.FileName, true);
                 _vm.LicenseFiles.Add(lm);
+                _vm.LicenseFiles = new ObservableCollection<LicenseModel>(_vm.LicenseFiles.OrderBy(v => v.FileName));
                 MessageBox.Show($"{_vm.MainDir + lm.FileName} generated", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             else
@@ -116,17 +128,18 @@ namespace LicenseGenerator
 
         private void BtnGenDevice_Click(object sender, RoutedEventArgs e)
         {
-            if(_vm.DeviceType == null || _vm.DeviceModel==string.Empty || _vm.DeviceSN == string.Empty)
+            if(_vm.DeviceType == string.Empty || _vm.DeviceModel==string.Empty || _vm.DeviceSN == string.Empty)
             {
                 MessageBox.Show("Invalidate data", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
             else
             {
-                var str = (_vm.DeviceType as ComboBoxItem).Content as string;
-                var lm = new LicenseModel(str.ToLower(), _vm.DeviceModel.ToLower(), _vm.DeviceSN.ToUpper());
+                var lm = new LicenseModel(_vm.DeviceType.ToLower(), _vm.DeviceModel.ToLower(), _vm.DeviceSN.ToUpper());
                 if (GenerateLicense(lm.FileName, _vm.DeviceSN, false))
                 {
+                    lm.SN = loadSN(lm.FileName, false);
                     _vm.LicenseFiles.Add(lm);
+                    _vm.LicenseFiles = new ObservableCollection<LicenseModel>(_vm.LicenseFiles.OrderBy(v => v.FileName));
                     MessageBox.Show($"{_vm.MainDir + lm.FileName} generated", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 else
@@ -154,17 +167,18 @@ namespace LicenseGenerator
 
         private void BtnGenFeature_Click(object sender, RoutedEventArgs e)
         {
-            if (_vm.FeatureModel == null || _vm.FeatureSN == string.Empty)
+            if (_vm.FeatureModel == string.Empty || _vm.FeatureSN == string.Empty)
             {
                 MessageBox.Show("Invalidate data", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
             else
             {
-                var str = (_vm.FeatureModel as ComboBoxItem).Content as string;
-                var lm = new LicenseModel("app", str.ToLower(), _vm.FeatureSN.ToUpper());
+                var lm = new LicenseModel("app", _vm.FeatureModel.ToLower(), _vm.FeatureSN.ToUpper());
                 if (GenerateLicense(lm.FileName, lm.SN, false))
                 {
+                    lm.SN = loadSN(lm.FileName, false);
                     _vm.LicenseFiles.Add(lm);
+                    _vm.LicenseFiles = new ObservableCollection<LicenseModel>(_vm.LicenseFiles.OrderBy(v => v.FileName));
                     MessageBox.Show($"{_vm.MainDir + lm.FileName} generated", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 else

@@ -45,8 +45,8 @@ namespace LicenseGenerator
             }
         }
 
-        private object deviceType;
-        public object DeviceType
+        private string deviceType;
+        public string DeviceType
         {
             get => deviceType;
             set
@@ -76,8 +76,8 @@ namespace LicenseGenerator
             }
         }
 
-        private object featureModel = "";
-        public object FeatureModel
+        private string featureModel = "";
+        public string FeatureModel
         {
             get => featureModel;
             set

@@ -52,10 +52,10 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <TextBlock Text="Directory" HorizontalAlignment="Left" Margin="5"/>
-                <TextBox Text="{Binding MainDir}" IsReadOnly="True" Grid.Column="1" HorizontalAlignment="Stretch" Margin="5"/>
+                <TextBox Text="{Binding MainDir}" Grid.Column="1" HorizontalAlignment="Stretch" Margin="5"/>
                 <Button Content="Select" Click="BtnSelect_Click" Grid.Column="2" Margin="5"/>
                 <TextBlock Text="CPU SN" Grid.Row="1" HorizontalAlignment="Left" Margin="5"/>
-                <TextBox Text="{Binding CpuSN}" Grid.Row="1" IsReadOnly="True" Grid.Column="1" HorizontalAlignment="Stretch" Margin="5"/>
+                <TextBox Text="{Binding CpuSN}" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" Margin="5"/>
                 <Button Content="Generate" Click="BtnGenerate_Click" Grid.Row="1" Grid.Column="2" Margin="5"/>
             </Grid>
         </Border>
@@ -74,7 +74,7 @@
                 <TextBlock Text="Type"/>
                 <TextBlock Text="Model" Grid.Column="1"/>
                 <TextBlock Text="Serial Number" Grid.Column="2"/>
-                <ComboBox SelectedItem="{Binding DeviceType}" Grid.Row="1" VerticalAlignment="Center" Margin="5">
+                <ComboBox Text="{Binding DeviceType}" Grid.Row="1" VerticalAlignment="Center" Margin="5">
                     <ComboBoxItem Content="Robot"/>
                     <ComboBoxItem Content="Scanner"/>
                 </ComboBox>
@@ -96,8 +96,8 @@
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="Model"/>
                 <TextBlock Text="Serial Number" Grid.Column="1"/>
-                <ComboBox SelectedItem="{Binding FeatureModel}" IsEditable="True" Grid.Row="1" VerticalAlignment="Center" Margin="5">
-                    <ComboBoxItem Content="tcpc"/>
+                <ComboBox Text="{Binding FeatureModel}" IsEditable="True" Grid.Row="1" VerticalAlignment="Center" Margin="5">
+                    <ComboBoxItem Content="tcp"/>
                     <ComboBoxItem Content="atcpc"/>
                 </ComboBox>
                 <TextBox Text="{Binding FeatureSN}" Grid.Column="1" Grid.Row="1"/>
@@ -113,29 +113,17 @@
                         <GridViewColumn Header="File Name" Width="Auto">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding FileName}" FontWeight="Bold"/>
+                                    <TextBlock Text="{Binding FileName}" FontWeight="Bold" Foreground="Black"/>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
                         <GridViewColumn Header="Serial Number" Width="Auto">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding SN}" FontWeight="Bold"/>
+                                    <TextBlock Text="{Binding SN}" FontWeight="Bold" Foreground="Black"/>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-                        <!--<GridViewColumn Header="{DynamicResource ScriptPanel.LsvCol3}" Width="500">
-                            --><!--<GridViewColumn.HeaderContainerStyle>
-                                    <Style TargetType="{x:Type GridViewColumnHeader}">
-                                        <Setter Property="HorizontalContentAlignment" Value="Left"/>
-                                    </Style>
-                                </GridViewColumn.HeaderContainerStyle>--><!--
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding Message}"/>
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>-->
                     </GridView.Columns>
                 </GridView>
             </ListView.View>
