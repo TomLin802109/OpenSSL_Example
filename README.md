@@ -1,4 +1,4 @@
-# OpenSSL Example
+# Encryption
 This example used OpenSSL ver. 3.3.1, download the installer [here](https://slproweb.com/products/Win32OpenSSL.html).
 
 Message Encrypt and Decrypt Example:

@@ -35,5 +35,13 @@
     <ClCompile Include="..\src\Encryptor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="encryption_wrap.cxx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="encryption.idl">
+      <Filter>Source Files</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>

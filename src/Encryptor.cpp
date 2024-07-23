@@ -2,22 +2,23 @@
 #include <openssl/evp.h>
 #include <fstream>
 #include <iostream>
+#include <algorithm>
 
 using namespace std;
 
 Encryptor::Encryptor() {
-	_key = (unsigned char*)"w96j0ej;32/2u04y3ej3zp4u.3vu04e";
-	_iv = (unsigned char*)"tjg3vu;4xu;4fwjefijnadjfjaosivt";
+	_key = vector<uint8_t>(32, 'q');
+	_iv = vector<uint8_t>(32, 'r');
 }
-Encryptor::Encryptor(const std::string& key, const std::string& iv) 
-	: _key((unsigned char*)key.c_str()), _iv((unsigned char*)iv.c_str()) {}
+Encryptor::Encryptor(const std::vector<unsigned char>& key, const std::vector<unsigned char>& iv)
+	: _key(key), _iv(iv) {}
 
 std::string Encryptor::Encrypt(const std::string& msg) {
 	string cipher;
 	vector<unsigned char> buf(max(msg.size(), (size_t)256));
 	int len = 0;
 	EVP_CIPHER_CTX* ctx = EVP_CIPHER_CTX_new();
-	EVP_EncryptInit(ctx, EVP_aes_256_cbc(), _key, _iv);
+	EVP_EncryptInit(ctx, EVP_aes_256_cbc(), _key.data(), _iv.data());
 	EVP_EncryptUpdate(ctx, buf.data(), &len, (unsigned char*)msg.c_str(), static_cast<int>(msg.size()));
 	cipher.append((char*)buf.data(), len);
 	EVP_EncryptFinal(ctx, buf.data(), &len);
@@ -30,7 +31,7 @@ std::string Encryptor::Decrypt(const std::string& cipher) {
 	vector<unsigned char> buf(cipher.size());
 	int len = 0;
 	EVP_CIPHER_CTX* ctx = EVP_CIPHER_CTX_new();
-	EVP_DecryptInit(ctx, EVP_aes_256_cbc(), _key, _iv);
+	EVP_DecryptInit(ctx, EVP_aes_256_cbc(), _key.data(), _iv.data());
 	EVP_DecryptUpdate(ctx, buf.data(), &len, (unsigned char*)cipher.c_str(), static_cast<int>(cipher.size()));
 	msg.append((char*)buf.data(), len);
 	EVP_DecryptFinal(ctx, buf.data(), &len);
@@ -38,7 +39,7 @@ std::string Encryptor::Decrypt(const std::string& cipher) {
 	return msg;
 }
 
-bool Encryptor::Encrypt(const std::string& src_file, const std::string& out_file, bool binary) {
+bool Encryptor::Encrypt(const std::string& src_file, const std::string& out_file) {
 	//read source file
 	ifstream ifs(src_file, ios::binary | ios::ate);
 	if (!ifs.is_open())
@@ -65,7 +66,7 @@ bool Encryptor::Encrypt(const std::string& src_file, const std::string& out_file
 	return out_size > 0;
 }
 
-bool Encryptor::Decrypt(const std::string& src_file, const std::string& out_file, bool binary) {
+bool Encryptor::Decrypt(const std::string& src_file, const std::string& out_file) {
 	//read source file
 	ifstream ifs(src_file, ios::binary | ios::ate);
 	if (!ifs.is_open())
@@ -92,9 +93,34 @@ bool Encryptor::Decrypt(const std::string& src_file, const std::string& out_file
 	return out_size > 0;
 }
 
-void Encryptor::SetKey(const std::string& key) {
-	_key = (unsigned char*)key.c_str();
+void Encryptor::SetKey(const std::vector<unsigned char>& key) {
+	_key = key;
 }
-void Encryptor::SetInitVec(const std::string& iv) {
-	_iv = (unsigned char*)iv.c_str();
+void Encryptor::SetInitVec(const std::vector<unsigned char>& iv) {
+	_iv = iv;
+}
+
+std::vector<unsigned char> Encryptor::Encrypt(const std::vector<unsigned char>& data) {
+	vector<unsigned char> res;
+	vector<unsigned char> buf(max(data.size(), (size_t)256));
+	int len = 0;
+	EVP_CIPHER_CTX* ctx = EVP_CIPHER_CTX_new();
+	EVP_EncryptInit(ctx, EVP_aes_256_cbc(), _key.data(), _iv.data());
+	EVP_EncryptUpdate(ctx, buf.data(), &len, data.data(), static_cast<int>(data.size()));
+	res.insert(res.end(), buf.begin(), buf.begin() + len);
+	EVP_EncryptFinal(ctx, buf.data(), &len);
+	res.insert(res.end(), buf.begin(), buf.begin() + len);
+	return res;
+}
+std::vector<unsigned char> Encryptor::Decrypt(const std::vector<unsigned char>& data) {
+	vector<unsigned char> res;
+	vector<unsigned char> buf(data.size());
+	int len = 0;
+	EVP_CIPHER_CTX* ctx = EVP_CIPHER_CTX_new();
+	EVP_DecryptInit(ctx, EVP_aes_256_cbc(), _key.data(), _iv.data());
+	EVP_DecryptUpdate(ctx, buf.data(), &len, data.data(), static_cast<int>(data.size()));
+	res.insert(res.end(), buf.begin(), buf.begin() + len);
+	EVP_DecryptFinal(ctx, buf.data(), &len);
+	res.insert(res.end(), buf.begin(), buf.begin() + len);
+	return res;
 }

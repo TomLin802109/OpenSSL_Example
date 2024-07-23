@@ -71,12 +71,12 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir)include;D:\OpenSSL-Win64\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(OutDir);D:\OpenSSL-Win64\lib\VC\x64\MT;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)include;C:\Program Files\OpenSSL-Win64\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(OutDir);C:\Program Files\OpenSSL-Win64\lib\VC\x64\MT;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(SolutionDir)include;D:\OpenSSL-Win64\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(OutDir);D:\OpenSSL-Win64\lib\VC\x64\MT;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)include;C:\Program Files\OpenSSL-Win64\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(OutDir);C:\Program Files\OpenSSL-Win64\lib\VC\x64\MT;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

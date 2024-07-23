@@ -9,8 +9,7 @@
 using namespace std;
 
 //Demo encrypto and decrypto
-void MessageEncrypt(const string& msg) {
-    Encryptor enc;
+void MessageEncrypt(Encryptor& enc, const string& msg) {
     auto st = clock();
     auto cipher = enc.Encrypt(msg);
     auto et = clock();
@@ -34,6 +33,7 @@ int main(int argc, char* argv[])
     vector<string> cmds, params;
     bool is_file = false, is_encrypt = true;
     Encryptor enc;
+    
     for (int i = 1; i < argc; i++) {
         if (*argv[i] == '-') {
             cmds.emplace_back(argv[i]+1);
@@ -41,19 +41,20 @@ int main(int argc, char* argv[])
                 is_file = true;
             if (strcmp(argv[i], "-dec") == 0)
                 is_encrypt = false;
-            if (strncmp(argv[i], "-key=", 5) == 0)
-                enc.SetKey(string(argv[i]+5));
+            if (strncmp(argv[i], "-key=", 5) == 0) {
+                auto start = (uint8_t*)argv[i] + 5;
+                enc.SetKey(vector<uint8_t>(start, start+ strlen(argv[i] + 5)));
+            }
         }
         else {
             params.emplace_back(argv[i]);
         }
     }
-    
     if (is_file && params.size() > 1) {
         ifstream ifs(params[0], ios::ate);
         auto input_size = ifs.tellg();
         auto st = clock();
-        auto s = is_encrypt ? enc.Encrypt(params[0], params[1], false) : enc.Decrypt(params[0], params[1], false);
+        auto s = is_encrypt ? enc.Encrypt(params[0], params[1]) : enc.Decrypt(params[0], params[1]);
         auto et = clock();
         if (s) {
             ifstream ifs(params[1], ios::ate);
@@ -80,7 +81,7 @@ int main(int argc, char* argv[])
                     "PC_CPU_ABCDEFGHIJKLMNOPQRSTUVWXYZ,;%!^@1234567890#$*&/?abcdefghijklmnopqrstuvwxyz"
         };
         for (auto& i : cases)
-            MessageEncrypt(i);
+            MessageEncrypt(enc, i);
     }
     //cout << "incorrect arguments" << endl;
     system("pause");
