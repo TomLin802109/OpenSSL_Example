@@ -180,7 +180,7 @@ namespace LicenseGenerator
             }
             else
             {
-                var lm = new LicenseModel("app", _vm.FeatureModel.ToLower(), _vm.FeatureSN.ToUpper());
+                var lm = new LicenseModel("feature", _vm.FeatureModel.ToLower(), _vm.FeatureSN.ToUpper());
                 if (GenerateLicense(lm.FileName, lm.SN, false))
                 {
                     lm.SN = loadSN(lm.FileName, false);
