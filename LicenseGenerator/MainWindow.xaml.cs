@@ -33,6 +33,7 @@ namespace LicenseGenerator
             _vm.CpuSN = getCPU();
             _vm.MainDir = AppDomain.CurrentDomain.BaseDirectory;
             loadLicenseFiles();
+            generateKey(_vm.CpuSN);
         }
         private string getCPU()
         {
@@ -42,10 +43,14 @@ namespace LicenseGenerator
             {
                 cpu_id = i["ProcessorID"].ToString();
             }
+            return cpu_id;
+        }
+
+        private ByteData generateKey(string cpu_id)
+        {
             var enc = new Encryptor();
             var cpu_b = Encoding.UTF8.GetBytes(cpu_id);
-            _key = enc.Encrypt(new ByteData(cpu_b));
-            return cpu_id;
+            return _key = enc.Encrypt(new ByteData(cpu_b));
         }
 
         private void loadLicenseFiles()
@@ -54,6 +59,7 @@ namespace LicenseGenerator
                 .Select(v => v.Split("\\").Last())
                 .Where(v => v.StartsWith("license_"));
             _vm.LicenseFiles = new ObservableCollection<LicenseModel>();
+            _key = generateKey(_vm.CpuSN);
             foreach (var i in license)
             {
                 var str = i.Split('_');
@@ -68,7 +74,8 @@ namespace LicenseGenerator
 
                 var sn_b = enc.Decrypt(new ByteData(cipher_b));
                 var sn = Encoding.UTF8.GetString(sn_b.ToArray());
-                _vm.LicenseFiles.Add(new LicenseModel(str[1], str[2], sn));
+
+                _vm.LicenseFiles.Add(new LicenseModel(str[1], str[2], sn.Length ==0? "No decryption result":sn));
             }
         }
 
@@ -184,6 +191,11 @@ namespace LicenseGenerator
                 else
                     MessageBox.Show("Generation failure", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+
+        private void MiRefresh_Click(object sender, RoutedEventArgs e)
+        {
+            loadLicenseFiles();
         }
     }
 }
