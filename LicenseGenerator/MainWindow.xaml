@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LicenseGenerator"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
         Title="License Generator" Height="600" Width="1000">
     <Window.Resources>
@@ -11,7 +12,7 @@
             <Style TargetType="GroupBox">
                 <Setter Property="FontSize" Value="18"/>
                 <Setter Property="BorderThickness" Value="2"/>
-                <!--<Setter Property="BorderBrush" Value="{StaticResource MainColor_Dark}"/>-->
+                <Setter Property="BorderBrush" Value="LightGray"/>
                 <Setter Property="Margin" Value="5"/>
             </Style>
             <Style TargetType="TextBlock">
@@ -43,13 +44,13 @@
         <Border BorderThickness="2" BorderBrush="LightGray" DockPanel.Dock="Top" Margin="5">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="1*"/>
                     <ColumnDefinition Width="4*"/>
                     <ColumnDefinition Width="1*"/>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
                 </Grid.RowDefinitions>
                 <TextBlock Text="Directory" HorizontalAlignment="Left" Margin="5"/>
                 <TextBox Text="{Binding MainDir}" Grid.Column="1" HorizontalAlignment="Stretch" Margin="5"/>
@@ -104,7 +105,11 @@
                 <Button Content="Generate" Click="BtnGenFeature_Click" Grid.RowSpan="2" Grid.Column="3" Margin="5"/>
             </Grid>
         </GroupBox>
-        <ListView DockPanel.Dock="top" x:Name="fileView" ItemsSource="{Binding LicenseFiles}" SelectionChanged="LvSelectionChange"
+        <GroupBox Header="Expiration Date" DockPanel.Dock="Right">
+            <Calendar SelectedDate="{Binding ExpirationDate}" DisplayDate="{Binding ExpirationDate}" Width="300" HorizontalAlignment="Center" VerticalAlignment="Center"
+                          SelectionMode="SingleDate" Grid.Row="2" Grid.Column="1" Margin="10"/>
+        </GroupBox>
+        <ListView x:Name="fileView" ItemsSource="{Binding LicenseFiles}" SelectionChanged="LvSelectionChange"
                   SelectedIndex="{Binding FileIndex}" SelectionMode="Single" Margin="5" FontSize="16">
             <ListView.View>
                 <GridView>
@@ -120,6 +125,13 @@
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding SN}" FontWeight="Bold" Foreground="Black"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Header="Exp. Date">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding ExpDate, StringFormat=yyyy/MM/dd}" FontWeight="Bold" Foreground="Black"/>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>

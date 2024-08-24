@@ -15,11 +15,11 @@ namespace LicenseGenerator
         public string Model { get; set; }
         public string SN { get; set; }
         public string FileName { get => $"license_{Type}_{Model}"; }
-
-        public LicenseModel(string type, string model, string sn)
-        {
-            Type = type; Model = model; SN = sn;
-        }
+        public DateTime ExpDate { get; set; }
+        //public LicenseModel(string type, string model, string sn)
+        //{
+        //    Type = type; Model = model; SN = sn;
+        //}
     }
     internal class ViewModel : INotifyPropertyChanged
     {
@@ -94,6 +94,17 @@ namespace LicenseGenerator
             set
             {
                 featureSN = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private DateTime expirationDate = DateTime.Now.AddYears(100);
+        public DateTime ExpirationDate
+        {
+            get => expirationDate;
+            set
+            {
+                expirationDate = value;
                 OnPropertyChanged();
             }
         }

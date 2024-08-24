@@ -33,7 +33,6 @@ namespace LicenseGenerator
             _vm.CpuSN = getCPU();
             _vm.MainDir = AppDomain.CurrentDomain.BaseDirectory;
             loadLicenseFiles();
-            generateKey(_vm.CpuSN);
         }
         private string getCPU()
         {
@@ -73,20 +72,46 @@ namespace LicenseGenerator
                 }
 
                 var sn_b = enc.Decrypt(new ByteData(cipher_b));
-                var sn = Encoding.UTF8.GetString(sn_b.ToArray());
-
-                _vm.LicenseFiles.Add(new LicenseModel(str[1], str[2], sn.Length ==0? "No decryption result":sn));
+                var sn = Encoding.UTF8.GetString(sn_b.Skip(6).ToArray());
+                var date = sn_b.Take(6).ToArray();
+                var lic = new LicenseModel()
+                {
+                    Type = str[1], Model = str[2],
+                    SN = sn.Length == 0 ? "No decryption result" : sn,
+                    ExpDate = new DateTime(BitConverter.ToUInt16(date, 0), BitConverter.ToUInt16(date, 2), BitConverter.ToUInt16(date, 4)) 
+                };
+                _vm.LicenseFiles.Add(lic);
             }
         }
 
-        private string loadSN(string fileName, bool is_pc)
+        private LicenseModel loadLicense(string fileName)
         {
+            var str = fileName.Split('_');
             var cipher_b = File.ReadAllBytes(_vm.MainDir + fileName);
             var enc = new Encryptor();
-            if (!is_pc)
+            if (str[1] != "pc")
+            {
                 enc.SetKey(_key);
-            var sn_b = enc.Decrypt(new ByteData(cipher_b)).ToArray();
-            return Encoding.UTF8.GetString(sn_b);
+            }
+
+            var sn_b = enc.Decrypt(new ByteData(cipher_b));
+            var sn = Encoding.UTF8.GetString(sn_b.Skip(6).ToArray());
+            var date = sn_b.Take(6).ToArray();
+            return new LicenseModel()
+            {
+                Type = str[1],
+                Model = str[2],
+                SN = sn.Length == 0 ? "No decryption result" : sn,
+                ExpDate = new DateTime(BitConverter.ToUInt16(date, 0), BitConverter.ToUInt16(date, 2), BitConverter.ToUInt16(date, 4))
+            };
+        }
+
+        private IEnumerable<byte> getBytes(DateTime date)
+        {
+            var b1 = BitConverter.GetBytes((ushort)date.Year);
+            var b2 = BitConverter.GetBytes((ushort)date.Month);
+            var b3 = BitConverter.GetBytes((ushort)date.Day);
+            return b1.Concat(b2).Concat(b3);
         }
 
         private bool GenerateLicense(string fileName, string sn, bool defKey=true)
@@ -95,27 +120,25 @@ namespace LicenseGenerator
             var enc = new Encryption.Encryptor();
             if (!defKey)
             {
-                var bs = Encoding.UTF8.GetBytes(_vm.CpuSN);
-                var key = enc.Encrypt(new ByteData(bs));
-                enc.SetKey(key);
+                _key = generateKey(_vm.CpuSN);
+                enc.SetKey(_key);
             }
-                
-            var res = enc.Encrypt(new Encryption.ByteData(in_b));
+            
+            var res = enc.Encrypt(new Encryption.ByteData(getBytes(_vm.ExpirationDate).Concat(in_b)));
+            
             File.WriteAllBytes(_vm.MainDir + fileName, res.ToArray());
             var cipher = File.ReadAllBytes(_vm.MainDir + fileName);
             var org_b = enc.Decrypt(new Encryption.ByteData(cipher)).ToArray();
-            var org_str = Encoding.UTF8.GetString(org_b);
+            var org_str = Encoding.UTF8.GetString(org_b.Skip(6).ToArray());
             return sn == org_str;
-            
         }
 
         private void BtnGenerate_Click(object sender, RoutedEventArgs e)
         {
-            var lm = new LicenseModel("pc", "cpu", _vm.CpuSN);
+            var lm = new LicenseModel() { Type = "pc", Model = "cpu", SN = _vm.CpuSN, ExpDate = _vm.ExpirationDate };
             if (GenerateLicense(lm.FileName, _vm.CpuSN, true))
             {
-                lm.SN = loadSN(lm.FileName, true);
-                _vm.LicenseFiles.Add(lm);
+                _vm.LicenseFiles.Add(loadLicense(lm.FileName));
                 _vm.LicenseFiles = new ObservableCollection<LicenseModel>(_vm.LicenseFiles.OrderBy(v => v.FileName));
                 MessageBox.Show($"{_vm.MainDir + lm.FileName} generated", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
             }
@@ -141,11 +164,10 @@ namespace LicenseGenerator
             }
             else
             {
-                var lm = new LicenseModel(_vm.DeviceType.ToLower(), _vm.DeviceModel.ToLower(), _vm.DeviceSN.ToUpper());
+                var lm = new LicenseModel() { Type = _vm.DeviceType.ToLower(), Model = _vm.DeviceModel.ToLower(), SN = _vm.DeviceSN.ToUpper(), ExpDate = _vm.ExpirationDate };
                 if (GenerateLicense(lm.FileName, _vm.DeviceSN, false))
                 {
-                    lm.SN = loadSN(lm.FileName, false);
-                    _vm.LicenseFiles.Add(lm);
+                    _vm.LicenseFiles.Add(loadLicense(lm.FileName));
                     _vm.LicenseFiles = new ObservableCollection<LicenseModel>(_vm.LicenseFiles.OrderBy(v => v.FileName));
                     MessageBox.Show($"{_vm.MainDir + lm.FileName} generated", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
@@ -180,11 +202,10 @@ namespace LicenseGenerator
             }
             else
             {
-                var lm = new LicenseModel("feature", _vm.FeatureModel.ToLower(), _vm.FeatureSN.ToUpper());
+                var lm = new LicenseModel() { Type = "feature", Model = _vm.FeatureModel.ToLower(), SN = _vm.FeatureSN.ToUpper(), ExpDate = _vm.ExpirationDate };
                 if (GenerateLicense(lm.FileName, lm.SN, false))
                 {
-                    lm.SN = loadSN(lm.FileName, false);
-                    _vm.LicenseFiles.Add(lm);
+                    _vm.LicenseFiles.Add(loadLicense(lm.FileName));
                     _vm.LicenseFiles = new ObservableCollection<LicenseModel>(_vm.LicenseFiles.OrderBy(v => v.FileName));
                     MessageBox.Show($"{_vm.MainDir + lm.FileName} generated", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
