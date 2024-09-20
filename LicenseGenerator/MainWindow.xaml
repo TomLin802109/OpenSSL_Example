@@ -55,9 +55,9 @@
                 <TextBlock Text="Directory" HorizontalAlignment="Left" Margin="5"/>
                 <TextBox Text="{Binding MainDir}" Grid.Column="1" HorizontalAlignment="Stretch" Margin="5"/>
                 <Button Content="Select" Click="BtnSelect_Click" Grid.Column="2" Margin="5"/>
-                <TextBlock Text="CPU SN" Grid.Row="1" HorizontalAlignment="Left" Margin="5"/>
-                <TextBox Text="{Binding CpuSN, Mode=TwoWay}" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" Margin="5"/>
-                <Button Content="Generate" Click="BtnGenerate_Click" Grid.Row="1" Grid.Column="2" Margin="5"/>
+                <TextBlock Text="PC SN" Grid.Row="1" HorizontalAlignment="Left" Margin="5"/>
+                <TextBox Text="{Binding MachineSN, Mode=TwoWay}" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" Margin="5"/>
+                <Button Content="Generate" Click="BtnGenerate_Click" Grid.Row="1" Grid.Column="2" Margin="5,5,5,0" Height="23" VerticalAlignment="Top"/>
             </Grid>
         </Border>
         <GroupBox Header="Device" DockPanel.Dock="Top" BorderThickness="2" BorderBrush="LightGray" Margin="5">
@@ -132,6 +132,13 @@
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding ExpDate, StringFormat=yyyy/MM/dd}" FontWeight="Bold" Foreground="Black"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Header="Last Date">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding LastDate, StringFormat=yyyy/MM/dd}" FontWeight="Bold" Foreground="Black"/>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>

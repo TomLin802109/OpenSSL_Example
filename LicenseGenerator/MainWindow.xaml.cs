@@ -30,7 +30,7 @@ namespace LicenseGenerator
         {
             InitializeComponent();
             this.DataContext = _vm;
-            _vm.CpuSN = getCPU();
+            _vm.MachineSN = getBaseBoradSN(); //getCPU();
             _vm.MainDir = AppDomain.CurrentDomain.BaseDirectory;
             loadLicenseFiles();
         }
@@ -44,7 +44,16 @@ namespace LicenseGenerator
             }
             return cpu_id;
         }
-
+        private string getBaseBoradSN()
+        {
+            var sn = string.Empty;
+            var _moc = new ManagementClass("win32_baseboard").GetInstances();
+            foreach (ManagementObject i in _moc)
+            {
+                sn = i["SerialNumber"].ToString();
+            }
+            return sn;
+        }
         private ByteData generateKey(string cpu_id)
         {
             var enc = new Encryptor();
@@ -58,29 +67,14 @@ namespace LicenseGenerator
                 .Select(v => v.Split("\\").Last())
                 .Where(v => v.StartsWith("license_"));
             _vm.LicenseFiles = new ObservableCollection<LicenseModel>();
-            _key = generateKey(_vm.CpuSN);
+            _key = generateKey(_vm.MachineSN);
             foreach (var i in license)
             {
                 var str = i.Split('_');
                 if (str.Length != 3)
                     continue;
-                var cipher_b = File.ReadAllBytes(_vm.MainDir + i);
-                var enc = new Encryptor();
-                if (str[1] != "pc")
-                {
-                    enc.SetKey(_key);
-                }
-
-                var sn_b = enc.Decrypt(new ByteData(cipher_b));
-                var sn = Encoding.UTF8.GetString(sn_b.Skip(6).ToArray());
-                var date = sn_b.Take(6).ToArray();
-                var lic = new LicenseModel()
-                {
-                    Type = str[1], Model = str[2],
-                    SN = sn.Length == 0 ? "No decryption result" : sn,
-                    ExpDate = new DateTime(BitConverter.ToUInt16(date, 0), BitConverter.ToUInt16(date, 2), BitConverter.ToUInt16(date, 4)) 
-                };
-                _vm.LicenseFiles.Add(lic);
+                var model = loadLicense(i);
+                _vm.LicenseFiles.Add(model);
             }
         }
 
@@ -95,14 +89,15 @@ namespace LicenseGenerator
             }
 
             var sn_b = enc.Decrypt(new ByteData(cipher_b));
-            var sn = Encoding.UTF8.GetString(sn_b.Skip(6).ToArray());
-            var date = sn_b.Take(6).ToArray();
+            var sn = Encoding.UTF8.GetString(sn_b.Skip(12).ToArray());
+            var date = sn_b.Take(12).ToArray();
             return new LicenseModel()
             {
                 Type = str[1],
                 Model = str[2],
                 SN = sn.Length == 0 ? "No decryption result" : sn,
-                ExpDate = new DateTime(BitConverter.ToUInt16(date, 0), BitConverter.ToUInt16(date, 2), BitConverter.ToUInt16(date, 4))
+                ExpDate = new DateTime(BitConverter.ToUInt16(date, 6), BitConverter.ToUInt16(date, 8), BitConverter.ToUInt16(date, 10)),
+                LastDate = new DateTime(BitConverter.ToUInt16(date, 0), BitConverter.ToUInt16(date, 2), BitConverter.ToUInt16(date, 4))
             };
         }
 
@@ -120,23 +115,23 @@ namespace LicenseGenerator
             var enc = new Encryption.Encryptor();
             if (!defKey)
             {
-                _key = generateKey(_vm.CpuSN);
+                _key = generateKey(_vm.MachineSN);
                 enc.SetKey(_key);
             }
             
-            var res = enc.Encrypt(new Encryption.ByteData(getBytes(_vm.ExpirationDate).Concat(in_b)));
+            var res = enc.Encrypt(new Encryption.ByteData(getBytes(DateTime.Now).Concat(getBytes(_vm.ExpirationDate)).Concat(in_b)));
             
             File.WriteAllBytes(_vm.MainDir + fileName, res.ToArray());
             var cipher = File.ReadAllBytes(_vm.MainDir + fileName);
             var org_b = enc.Decrypt(new Encryption.ByteData(cipher)).ToArray();
-            var org_str = Encoding.UTF8.GetString(org_b.Skip(6).ToArray());
+            var org_str = Encoding.UTF8.GetString(org_b.Skip(12).ToArray());
             return sn == org_str;
         }
 
         private void BtnGenerate_Click(object sender, RoutedEventArgs e)
         {
-            var lm = new LicenseModel() { Type = "pc", Model = "cpu", SN = _vm.CpuSN, ExpDate = _vm.ExpirationDate };
-            if (GenerateLicense(lm.FileName, _vm.CpuSN, true))
+            var lm = new LicenseModel() { Type = "pc", Model = "baseboard", SN = _vm.MachineSN, ExpDate = _vm.ExpirationDate };
+            if (GenerateLicense(lm.FileName, _vm.MachineSN, true))
             {
                 _vm.LicenseFiles.Add(loadLicense(lm.FileName));
                 _vm.LicenseFiles = new ObservableCollection<LicenseModel>(_vm.LicenseFiles.OrderBy(v => v.FileName));

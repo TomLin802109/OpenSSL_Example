@@ -16,10 +16,7 @@ namespace LicenseGenerator
         public string SN { get; set; }
         public string FileName { get => $"license_{Type}_{Model}"; }
         public DateTime ExpDate { get; set; }
-        //public LicenseModel(string type, string model, string sn)
-        //{
-        //    Type = type; Model = model; SN = sn;
-        //}
+        public DateTime LastDate { get; set; }
     }
     internal class ViewModel : INotifyPropertyChanged
     {
@@ -35,7 +32,7 @@ namespace LicenseGenerator
         }
 
         private string cpuSN = "";
-        public string CpuSN
+        public string MachineSN
         {
             get => cpuSN;
             set
