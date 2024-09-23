@@ -15,6 +15,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Encryption;
 using System.Collections.ObjectModel;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace LicenseGenerator
 {
@@ -87,18 +88,25 @@ namespace LicenseGenerator
             {
                 enc.SetKey(_key);
             }
-
             var sn_b = enc.Decrypt(new ByteData(cipher_b));
-            var sn = Encoding.UTF8.GetString(sn_b.Skip(12).ToArray());
-            var date = sn_b.Take(12).ToArray();
-            return new LicenseModel()
+            var res = new LicenseModel()
             {
                 Type = str[1],
                 Model = str[2],
-                SN = sn.Length == 0 ? "No decryption result" : sn,
-                ExpDate = new DateTime(BitConverter.ToUInt16(date, 6), BitConverter.ToUInt16(date, 8), BitConverter.ToUInt16(date, 10)),
-                LastDate = new DateTime(BitConverter.ToUInt16(date, 0), BitConverter.ToUInt16(date, 2), BitConverter.ToUInt16(date, 4))
+                SN = "Incorrect format"
             };
+            if (sn_b.Count() <= 12)
+                return res;
+            var sn = Encoding.UTF8.GetString(sn_b.Skip(12).ToArray());
+            var date = sn_b.Take(12).ToArray();
+            try
+            {
+                res.SN = sn.Length > 0 ? sn : "No decryption result";
+                res.LastDate = new DateTime(BitConverter.ToUInt16(date, 0), BitConverter.ToUInt16(date, 2), BitConverter.ToUInt16(date, 4));
+                res.ExpDate = new DateTime(BitConverter.ToUInt16(date, 6), BitConverter.ToUInt16(date, 8), BitConverter.ToUInt16(date, 10));
+            }
+            catch { }
+            return res;
         }
 
         private IEnumerable<byte> getBytes(DateTime date)
