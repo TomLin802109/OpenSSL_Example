@@ -42,6 +42,13 @@ namespace LicenseGenerator
             }
         }
 
+        private List<string> machineSNs = new List<string>();
+        public List<string> MachineSNs
+        {
+            get => machineSNs;
+            set { machineSNs = value; OnPropertyChanged(); }
+        }
+
         private string deviceType;
         public string DeviceType
         {

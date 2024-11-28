@@ -31,7 +31,10 @@ namespace LicenseGenerator
         {
             InitializeComponent();
             this.DataContext = _vm;
-            _vm.MachineSN = getBaseBoradSN(); //getCPU();
+            //_vm.MachineSN = getBaseBoradSN(); //getCPU();
+            _vm.MachineSNs.Add(getCPU());
+            _vm.MachineSNs.Add(getBaseBoradSN());
+            _vm.MachineSNs.AddRange(getMacAddress());
             _vm.MainDir = AppDomain.CurrentDomain.BaseDirectory;
             loadLicenseFiles();
         }
@@ -54,6 +57,32 @@ namespace LicenseGenerator
                 sn = i["SerialNumber"].ToString();
             }
             return sn;
+        }
+        private string[] getMacAddress()
+        {
+            try
+            {
+                ManagementObjectSearcher objMOS = new ManagementObjectSearcher("Select * FROM Win32_NetworkAdapterConfiguration");
+                var macLs = new List<string>();
+                foreach (ManagementObject objMO in objMOS.Get())
+                {
+                    object tempMacAddrObj = objMO["MacAddress"];
+                    if (tempMacAddrObj == null) //Skip objects without a MACAddress
+                        continue;
+                    macLs.Add(tempMacAddrObj.ToString());
+                    //foreach (PropertyData prop in objMO.Properties)
+                    //{
+                    //    if (prop.Value != null)
+                    //        Console.WriteLine("{0}: {1}", prop.Name, prop.Value);
+                    //}
+                    objMO.Dispose();
+                }
+                return macLs.ToArray();
+            }
+            catch (Exception e)
+            {
+                return Array.Empty<string>();
+            }
         }
         private ByteData generateKey(string cpu_id)
         {
@@ -138,7 +167,7 @@ namespace LicenseGenerator
 
         private void BtnGenerate_Click(object sender, RoutedEventArgs e)
         {
-            var lm = new LicenseModel() { Type = "pc", Model = "baseboard", SN = _vm.MachineSN, ExpDate = _vm.ExpirationDate };
+            var lm = new LicenseModel() { Type = "pc", Model = "", SN = _vm.MachineSN, ExpDate = _vm.ExpirationDate };
             if (GenerateLicense(lm.FileName, _vm.MachineSN, true))
             {
                 _vm.LicenseFiles.Add(loadLicense(lm.FileName));
