@@ -35,6 +35,7 @@ namespace LicenseGenerator
             _vm.MachineSNs.Add(getCPU());
             _vm.MachineSNs.Add(getBaseBoradSN());
             _vm.MachineSNs.AddRange(getMacAddress());
+            _vm.MachineSN = _vm.MachineSNs.First();
             _vm.MainDir = AppDomain.CurrentDomain.BaseDirectory;
             loadLicenseFiles();
         }
