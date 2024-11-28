@@ -7,7 +7,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenSSL_Example", "OpenSSL_
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "encryption", "encryption\encryption.vcxproj", "{A2436315-DC2F-4D0A-80F1-3BE1ECEB74F8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LicenseGenerator", "LicenseGenerator\LicenseGenerator.csproj", "{E5FD9DAC-2F84-4225-8D4C-20E9E1A10EAD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LicenseGenerator", "LicenseGenerator\LicenseGenerator.csproj", "{E5FD9DAC-2F84-4225-8D4C-20E9E1A10EAD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

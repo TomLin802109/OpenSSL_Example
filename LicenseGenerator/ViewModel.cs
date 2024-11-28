@@ -31,13 +31,13 @@ namespace LicenseGenerator
             }
         }
 
-        private string cpuSN = "";
+        private string machineSN = "";
         public string MachineSN
         {
-            get => cpuSN;
+            get => machineSN;
             set
             {
-                cpuSN = value;
+                machineSN = value;
                 OnPropertyChanged();
             }
         }
@@ -49,55 +49,45 @@ namespace LicenseGenerator
             set { machineSNs = value; OnPropertyChanged(); }
         }
 
-        private string deviceType;
-        public string DeviceType
+        private List<string> typeNames = new List<string>()
         {
-            get => deviceType;
+            "Robot", "Scanner", "Module"
+        };
+        public List<string> TypeNames
+        {
+            get => typeNames;
+            set { typeNames = value; OnPropertyChanged(); }
+        }
+
+
+        private string typeName;
+        public string TypeName
+        {
+            get => typeName;
             set
             {
-                deviceType = value;
+                typeName = value;
                 OnPropertyChanged();
             }
         }
-        private string deviceModel = "";
-        public string DeviceModel
+        private string modelName = "";
+        public string ModelName
         {
-            get => deviceModel;
+            get => modelName;
             set
             {
-                deviceModel = value;
-                OnPropertyChanged();
-            }
-        }
-        private string deviceSN = "";
-        public string DeviceSN
-        {
-            get => deviceSN;
-            set
-            {
-                deviceSN = value;
+                modelName = value;
                 OnPropertyChanged();
             }
         }
 
-        private string featureModel = "";
-        public string FeatureModel
+        private string sn = "";
+        public string SN
         {
-            get => featureModel;
+            get => sn;
             set
             {
-                featureModel = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private string featureSN = "";
-        public string FeatureSN
-        {
-            get => featureSN;
-            set
-            {
-                featureSN = value;
+                sn = value;
                 OnPropertyChanged();
             }
         }
