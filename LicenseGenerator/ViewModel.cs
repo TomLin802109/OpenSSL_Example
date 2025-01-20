@@ -51,7 +51,7 @@ namespace LicenseGenerator
 
         private List<string> typeNames = new List<string>()
         {
-            "Robot", "Scanner", "Module"
+            "Robot", "Scanner", "Module", "Camera"
         };
         public List<string> TypeNames
         {
